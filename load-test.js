@@ -45,12 +45,37 @@ function testDashboard() {
 }
 
 
+function testMap() {
+  const BASE_URL = "http://localhost:3002/fhis-api/v1";
+  const URL = `${BASE_URL}/navigation/firehydrant/search/filter?boundWest=101.39694213867189&boundSouth=3.0218981802157385&boundEast=101.96823120117189&boundNorth=3.324244254076954&zoom=18`;
+  const BEARER_TOKEN = 'BEARER_TOKEN';
+  const params = {
+    headers: {
+      'Authorization': `Bearer ${BEARER_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+  };
+  const response = http.get(URL, params);
+
+  // Validate the response
+  check(response, {
+    'status is 200': (r) => r.status === 200,
+    'response time < 500ms': (r) => r.timings.duration < 500,
+    // 'body contains text': (r) => r.body.includes('Collection of simple web-pages'),
+  });
+
+  // Simulate user think time
+  sleep(1);
+}
+
+
 
 
 
 // Main test function
 export default function () {
-  testDashboard();
+  // testDashboard();
+  testMap();
 }
 
 // Setup function (runs once before the test starts)
