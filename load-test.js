@@ -23,7 +23,7 @@ export const options = {
 
 
 function testDashboard() {
-  const BASE_URL = "http://localhost:3002/fhis-api/v1";
+  const BASE_URL = "https://fhis-c4i.siagalabs.dev/fhis-api/v1";
   const URL = `${BASE_URL}/dashboard/state/filter?role=Penyelia HQ&inspection_target_date=2026-01-29T01:28:08.950Z`;
   const BEARER_TOKEN = 'BEARER_TOKEN';
   const params = {
@@ -47,7 +47,7 @@ function testDashboard() {
 
 
 function testMap() {
-  const BASE_URL = "http://localhost:3002/fhis-api/v1";
+  const BASE_URL = "https://fhis-c4i.siagalabs.dev/fhis-api/v1";
   const URL = `${BASE_URL}/navigation/firehydrant/search/filter?boundWest=101.39694213867189&boundSouth=3.0218981802157385&boundEast=101.96823120117189&boundNorth=3.324244254076954&zoom=18`;
   const BEARER_TOKEN = 'BEARER_TOKEN';
   const params = {
@@ -71,7 +71,7 @@ function testMap() {
 
 
 function testSearchFh() {
-  const BASE_URL = "http://localhost:3002/fhis-api/v1";
+  const BASE_URL = "https://fhis-c4i.siagalabs.dev/fhis-api/v1";
   const URL = `${BASE_URL}/firehydrant/search/filter?take=10&offset=0`;
   const BEARER_TOKEN = 'BEARER_TOKEN';
   const params = {
@@ -100,8 +100,8 @@ function testSearchFh() {
 // Main test function
 export default function () {
   // testDashboard();
-  // testMap();
-  testSearchFh();
+  testMap();
+  // testSearchFh();
 }
 
 // Setup function (runs once before the test starts)
@@ -112,21 +112,10 @@ export function setup() {
 // Teardown function (runs once after the test completes)
 export function teardown(data) {
   console.log('Load test completed!');
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export function handleSummary(data) {
+  return {
+    'summary.json': JSON.stringify(data),
+  };
 }
