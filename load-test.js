@@ -7,13 +7,13 @@ import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.1/index.js';
 export const options = {
   // Realistic approach
   stages: [
-    { duration: '10s', target: 10 },
-    // { duration: '30s', target: 10 },   // Warm up with 10 users
-    // { duration: '1m', target: 50 },    // Increase to 50
-    // { duration: '1m', target: 100 },   // Increase to 100
-    // { duration: '1m', target: 250 },   // Increase to 250
-    // { duration: '1m', target: 500 },   // Peak at 500
-    // { duration: '30s', target: 0 },    // Ramp down
+    // { duration: '10s', target: 10 },
+    { duration: '30s', target: 10 },   // Warm up with 10 users
+    { duration: '1m', target: 50 },    // Increase to 50
+    { duration: '1m', target: 100 },   // Increase to 100
+    { duration: '1m', target: 250 },   // Increase to 250
+    { duration: '1m', target: 500 },   // Peak at 500
+    { duration: '30s', target: 0 },    // Ramp down
   ],
   thresholds: {
     http_req_duration: ['p(95)<500'], // 95% of requests should be below 500ms
