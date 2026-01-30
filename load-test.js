@@ -24,7 +24,7 @@ export const options = {
 function testDashboard() {
   const BASE_URL = "https://fhis-c4i.siagalabs.dev/fhis-api/v1";
   const URL = `${BASE_URL}/dashboard/state/filter?role=Penyelia HQ&inspection_target_date=2026-01-29T01:28:08.950Z`;
-  const BEARER_TOKEN = 'BEARER_TOKEN';
+  const BEARER_TOKEN = __ENV.BEARER_TOKEN;
   const params = {
     headers: {
       'Authorization': `Bearer ${BEARER_TOKEN}`,
@@ -44,7 +44,7 @@ function testDashboard() {
 function testMap() {
   const BASE_URL = "https://fhis-c4i.siagalabs.dev/fhis-api/v1";
   const URL = `${BASE_URL}/navigation/firehydrant/search/filter?boundWest=101.39694213867189&boundSouth=3.0218981802157385&boundEast=101.96823120117189&boundNorth=3.324244254076954&zoom=18`;
-  const BEARER_TOKEN = 'BEARER_TOKEN';
+  const BEARER_TOKEN = __ENV.BEARER_TOKEN;
   const params = {
     headers: {
       'Authorization': `Bearer ${BEARER_TOKEN}`,
@@ -63,8 +63,8 @@ function testMap() {
 
 function testSearchFh() {
   const BASE_URL = "https://fhis-c4i.siagalabs.dev/fhis-api/v1";
-  const URL = `${BASE_URL}/firehydrant/search/filter?take=10&offset=0`;
-  const BEARER_TOKEN = 'BEARER_TOKEN';
+  const URL = `${BASE_URL}/firehydrant/search/filter?take=10&offset=0&station_id=291e4a88-0bad-4a01-bfc2-9f505437436f&state_id=b74645e5-3ad2-4dd9-ba72-3b7eb8f16643`;
+  const BEARER_TOKEN = __ENV.BEARER_TOKEN;
   const params = {
     headers: {
       'Authorization': `Bearer ${BEARER_TOKEN}`,
@@ -92,8 +92,8 @@ function testSearchFh() {
 // Main test function
 export default function () {
   // testDashboard();
-  testMap();
-  // testSearchFh();
+  // testMap();
+  testSearchFh();
 }
 
 // Setup function (runs once before the test starts)
