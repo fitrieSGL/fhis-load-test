@@ -4,20 +4,32 @@ import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporte
 import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.1/index.js';
 
 // Test configuration
+// export const options = {
+//   // Realistic approach
+//   stages: [
+//     // { duration: '10s', target: 10 },
+//     { duration: '30s', target: 10 },   // Warm up with 10 users
+//     { duration: '1m', target: 50 },    // Increase to 50
+//     { duration: '1m', target: 100 },   // Increase to 100
+//     { duration: '1m', target: 250 },   // Increase to 250
+//     { duration: '1m', target: 500 },   // Peak at 500
+//     { duration: '30s', target: 0 },    // Ramp down
+//   ],
+//   thresholds: {
+//     http_req_duration: ['p(95)<500'], // 95% of requests should be below 500ms
+//     http_req_failed: ['rate<0.1'],    // Error rate should be less than 10%
+//   },
+// };
+
 export const options = {
-  // Realistic approach
   stages: [
-    // { duration: '10s', target: 10 },
-    { duration: '30s', target: 10 },   // Warm up with 10 users
-    { duration: '1m', target: 50 },    // Increase to 50
-    { duration: '1m', target: 100 },   // Increase to 100
-    { duration: '1m', target: 250 },   // Increase to 250
-    { duration: '1m', target: 500 },   // Peak at 500
-    { duration: '30s', target: 0 },    // Ramp down
+    { duration: '10s', target: 10 },   // Warm up with 10 users
+    { duration: '40s', target: 50 },   // Increase to 50
+    { duration: '10s', target: 0 },    // Ramp down
   ],
   thresholds: {
-    http_req_duration: ['p(95)<500'], // 95% of requests should be below 500ms
-    http_req_failed: ['rate<0.1'],    // Error rate should be less than 10%
+    http_req_duration: ['p(95)<500'],
+    http_req_failed: ['rate<0.1'],
   },
 };
 
@@ -61,17 +73,85 @@ function testMap() {
   sleep(1);
 }
 
-function testSearchFh() {
-  const BASE_URL = "https://fhis-c4i.siagalabs.dev/fhis-api/v1";
-  const URL = `${BASE_URL}/firehydrant/search/filter?take=10&offset=0&station_id=291e4a88-0bad-4a01-bfc2-9f505437436f&state_id=b74645e5-3ad2-4dd9-ba72-3b7eb8f16643`;
-  const BEARER_TOKEN = __ENV.BEARER_TOKEN;
+// function testSearchFh() {
+//   const BASE_URL = "https://fhis-c4i.siagalabs.dev/fhis-api/v1";
+//   const URL = `${BASE_URL}/firehydrant/search/filter?take=10&offset=0&station_id=291e4a88-0bad-4a01-bfc2-9f505437436f&state_id=b74645e5-3ad2-4dd9-ba72-3b7eb8f16643`;
+//   const BEARER_TOKEN = __ENV.BEARER_TOKEN;
+//   const params = {
+//     headers: {
+//       'Authorization': `Bearer ${BEARER_TOKEN}`,
+//       'Content-Type': 'application/json',
+//     },
+//   };
+//   const response = http.get(URL, params);
+
+//   check(response, {
+//     'status is 200': (r) => r.status === 200,
+//     'response time < 500ms': (r) => r.timings.duration < 500,
+//   });
+
+//   sleep(1);
+// }
+
+
+function testSearchUserFois() {
+  const BASE_URL = "https://fhis-c4i.siagalabs.dev/fhis-api/v1/fois-api/profile/search";
+  const BEARER_TOKEN = __ENV.BEARER_TOKEN; // ← from env
+
+  if (!BEARER_TOKEN) {
+    console.error('BEARER_TOKEN is missing!');
+    return;
+  }
+
   const params = {
     headers: {
       'Authorization': `Bearer ${BEARER_TOKEN}`,
       'Content-Type': 'application/json',
     },
   };
-  const response = http.get(URL, params);
+
+  const body = JSON.stringify({
+    "page": { "pageNumber": 0, "pageSize": 10 },
+    "sort": [{ "field": "name", "order": 1 }],
+    "search": "",
+    "nricNo": "74040111505",
+    "stationUuid": "",
+    "zoneUuid": "",
+    "stateUuid": "",
+    "serviceNo": "",
+    "unitList": [],
+    "positionList": []
+  });
+
+  const response = http.post(BASE_URL, body, params);
+  // console.log(`Status: ${response.status}`); // helpful during debugging
+
+  check(response, {
+    'status is 201': (r) => r.status === 201,
+    'response time < 500ms': (r) => r.timings.duration < 500,
+  });
+
+  sleep(1);
+}
+
+function testAuthorizeStaff() {
+  const BASE_URL = "https://fhis-c4i.siagalabs.dev/fhis-api/v1/staff/authorize";
+  const BEARER_TOKEN = __ENV.BEARER_TOKEN; // ← from env
+
+  if (!BEARER_TOKEN) {
+    console.error('BEARER_TOKEN is missing!');
+    return;
+  }
+
+  const params = {
+    headers: {
+      'Authorization': `Bearer ${BEARER_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+  };
+
+  const response = http.get(BASE_URL, params);
+  // console.log(`Status: ${response.status}`); // helpful during debugging
 
   check(response, {
     'status is 200': (r) => r.status === 200,
@@ -89,12 +169,15 @@ function testSearchFh() {
 
 
 
-// Main test function
+//--------------------------------------------------------------------- Main test function ---------------------------------------------------------------------//
 export default function () {
   // testDashboard();
   // testMap();
-  testSearchFh();
+  // testSearchFh();
+  // testSearchUserFois();
+  testAuthorizeStaff();
 }
+//--------------------------------------------------------------------- Main test function ---------------------------------------------------------------------//
 
 // Setup function (runs once before the test starts)
 export function setup() {
