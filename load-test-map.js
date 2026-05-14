@@ -15,37 +15,11 @@ export const options = {
   },
 };
 
-const BASE_URL = "https://fhis-c4i.siagalabs.dev/fhis-api/v1";
-
-
-function testDashboardStation() {
+function testMapFHBoundingBox() {
+  const BASE_URL = "https://fhis-c4i.siagalabs.dev/fhis-api/v1";
   const BEARER_TOKEN = __ENV.BEARER_TOKEN;
 
-  const role = encodeURIComponent("Penyelia Balai");
-  const date = encodeURIComponent("2026-01-29T01:28:08.950Z");
-  const URL = `${BASE_URL}/dashboard/station/filter?role=${role}&station_id=291e4a88-0bad-4a01-bfc2-9f505437436f&inspection_target_date=${date}`;
-
-  const params = {
-    headers: {
-      'Authorization': `Bearer ${BEARER_TOKEN}`,
-      'Content-Type': 'application/json',
-    },
-  };
-  const response = http.get(URL, params);
-  check(response, {
-    'status is 200': (r) => r.status === 200,
-    'response time < 500ms': (r) => r.timings.duration < 500,
-  });
-
-  sleep(1);
-}
-
-function testDashboardState() {
-  const BEARER_TOKEN = __ENV.BEARER_TOKEN;
-
-  const role = encodeURIComponent("Penyelia HQ");
-  const date = encodeURIComponent("2026-01-29T01:28:08.950Z");
-  const URL = `${BASE_URL}/dashboard/state/filter?role=${role}&inspection_target_date=${date}`;
+  const URL = `${BASE_URL}/navigation/firehydrant/search/filter?boundWest=101.39694213867189&boundSouth=3.0218981802157385&boundEast=101.96823120117189&boundNorth=3.324244254076954`;
 
   const params = {
     headers: {
@@ -76,8 +50,7 @@ function testDashboardState() {
 
 //--------------------------------------------------------------------- Main test function ---------------------------------------------------------------------//
 export default function () {
-  testDashboardStation();
-  // testDashboardState();
+  testMapFHBoundingBox();
 }
 //--------------------------------------------------------------------- Main test function ---------------------------------------------------------------------//
 
@@ -102,7 +75,13 @@ export function handleSummary(data) {
 
   return {
     // Beautiful HTML report with charts
-    // [`load-test-dashboard-report-${timestamp}.html`]: htmlReport(data),
+    [`load-test-map-report-${timestamp}.html`]: htmlReport(data),
+
+    // // PDF-ready HTML report (styled for printing/PDF conversion)
+    // [`load-test-report-pdf-ready-${timestamp}.html`]: generatePdfReadyReport(data),
+
+    // // JSON for raw data
+    // [`load-test-results-${timestamp}.json`]: JSON.stringify(data, null, 2),
 
     // Console summary
     'stdout': textSummary(data, { indent: ' ', enableColors: true }),
