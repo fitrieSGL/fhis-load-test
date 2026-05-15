@@ -3,26 +3,11 @@ import { check, sleep } from 'k6';
 import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.1/index.js';
 
-// export const options = {
-//   stages: [
-//     { duration: '10s', target: 10 },   // Warm up with 10 users
-//     { duration: '40s', target: 50 },   // Increase to 50
-//     { duration: '10s', target: 0 },    // Ramp down
-//   ],
-//   thresholds: {
-//     http_req_duration: ['p(95)<500'],
-//     http_req_failed: ['rate<0.1'],
-//   },
-// };
-
 export const options = {
   stages: [
-    { duration: '1m',   target: 10  },  // Trickle in early users
-    { duration: '2m',   target: 50  },  // Morning ramp up
-    { duration: '2m',   target: 120 },  // Peak traffic building
-    { duration: '2m',   target: 200 },  // Full peak load
-    { duration: '1m',   target: 80  },  // Post-peak drop
-    { duration: '30s',  target: 0   },  // Ramp down
+    { duration: '10s', target: 10 },   // Warm up with 10 users
+    { duration: '40s', target: 50 },   // Increase to 50
+    { duration: '10s', target: 0 },    // Ramp down
   ],
   thresholds: {
     http_req_duration: ['p(95)<500'],
@@ -30,14 +15,12 @@ export const options = {
   },
 };
 
-function testAuthorizeStaff() {
-  const BASE_URL = "https://fhis-c4i.siagalabs.dev/fhis-api/v1/staff/authorize";
-  const BEARER_TOKEN = __ENV.BEARER_TOKEN; // ← from env
+const BASE_URL = "https://fhis-c4i.siagalabs.dev/fhis-api/v1";
 
-  if (!BEARER_TOKEN) {
-    console.error('BEARER_TOKEN is missing!');
-    return;
-  }
+function testFilterFhMasterlist() {
+  const BEARER_TOKEN = __ENV.BEARER_TOKEN;
+
+  const URL = `${BASE_URL}/firehydrant/search/filter?station_id=94e691f5-a2ac-4fbe-bb7f-5228dc2c49f3&state_id=b74645e5-3ad2-4dd9-ba72-3b7eb8f16643&take=10&offset=0`;
 
   const params = {
     headers: {
@@ -45,10 +28,7 @@ function testAuthorizeStaff() {
       'Content-Type': 'application/json',
     },
   };
-
-  const response = http.get(BASE_URL, params);
-  // console.log(`Status: ${response.status}`); // helpful during debugging
-
+  const response = http.get(URL, params);
   check(response, {
     'status is 200': (r) => r.status === 200,
     'response time < 500ms': (r) => r.timings.duration < 500,
@@ -71,7 +51,7 @@ function testAuthorizeStaff() {
 
 //--------------------------------------------------------------------- Main test function ---------------------------------------------------------------------//
 export default function () {
-  testAuthorizeStaff();
+  testFilterFhMasterlist();
 }
 //--------------------------------------------------------------------- Main test function ---------------------------------------------------------------------//
 
@@ -96,7 +76,7 @@ export function handleSummary(data) {
 
   return {
     // Beautiful HTML report with charts
-    [`load-test-login-report-${timestamp}.html`]: htmlReport(data),
+    [`load-test-map-report-${timestamp}.html`]: htmlReport(data),
 
     // // PDF-ready HTML report (styled for printing/PDF conversion)
     // [`load-test-report-pdf-ready-${timestamp}.html`]: generatePdfReadyReport(data),
